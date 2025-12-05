@@ -1,21 +1,10 @@
-target/
-
-*.bak
-*.swp
-
-.idea/
-
-.mvn/
-mvnw
-mvnw.cmd
-
-*.jar
-
 HELP.md
+target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -24,10 +13,13 @@ HELP.md
 .springBeans
 .sts4-cache
 
+### IntelliJ IDEA ###
+.idea
 *.iws
 *.iml
 *.ipr
 
+### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -37,4 +29,5 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### VS Code ###
 .vscode/
