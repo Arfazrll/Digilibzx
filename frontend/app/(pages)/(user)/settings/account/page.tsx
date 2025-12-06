@@ -19,7 +19,6 @@ import { toast } from "sonner";
 import { fetchUserById, updateUserById } from "@/lib/api/users";
 import LoadingComponent from "@/components/loading";
 
-// Schema validasi menggunakan zod
 const profileFormSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
@@ -28,10 +27,7 @@ const profileFormSchema = z.object({
     message: "Please enter a valid email address.",
   }),
   phone: z.string().optional(),
-  role: z.enum(["admin", "student", "lecturer"]),
-  nim: z.string().optional(),
-  nip: z.string().optional(),
-  year: z.string().optional(),
+  role: z.enum(["admin", "user"]),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -45,10 +41,7 @@ export default function ProfileSettingsPage() {
       name: "",
       email: "",
       phone: "",
-      role: "student",
-      nim: "",
-      nip: "",
-      year: "",
+      role: "user",
     },
     mode: "onChange",
   });
@@ -67,9 +60,6 @@ export default function ProfileSettingsPage() {
           email: userData.email,
           phone: userData.phone,
           role: userData.role,
-          nim: userData.nim || "",
-          nip: userData.nip || "",
-          year: userData.year || "",
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -89,16 +79,11 @@ export default function ProfileSettingsPage() {
   
       setIsLoading(true);
   
-      // Pastikan properti opsional memiliki nilai string kosong jika undefined
       const sanitizedData = {
         ...data,
         phone: data.phone || "",
-        nim: data.nim || "",
-        nip: data.nip || "",
-        year: data.year || "",
       };
   
-      // Panggil API untuk memperbarui user
       const updatedUser = await updateUserById(userId, sanitizedData);
   
       console.log("Profil berhasil diperbarui:", updatedUser);
@@ -110,8 +95,6 @@ export default function ProfileSettingsPage() {
       setIsLoading(false);
     }
   };
-
-  const role = form.watch("role");
 
   if (isLoading) {
     return <LoadingComponent/>;
@@ -174,51 +157,6 @@ export default function ProfileSettingsPage() {
               </FormItem>
             )}
           />
-          {role === "student" && (
-            <FormField
-              control={form.control}
-              name="nim"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>NIM</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your NIM" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-          {role === "lecturer" && (
-            <FormField
-              control={form.control}
-              name="nip"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>NIP</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your NIP" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-          {role === "student" && (
-            <FormField
-              control={form.control}
-              name="year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Year</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Year of entry" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
           <Separator />
           <Button type="submit">Update profile</Button>
         </form>

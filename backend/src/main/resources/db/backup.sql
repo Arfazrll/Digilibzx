@@ -3,11 +3,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255),
-    role ENUM('admin', 'student', 'lecturer') NOT NULL,
-    phone VARCHAR(255) UNIQUE,
-    nim VARCHAR(255) UNIQUE,
-    nip VARCHAR(255) UNIQUE,
-    year VARCHAR(255)
+    role ENUM('ADMIN', 'USER') NOT NULL,
+    phone VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE books (
@@ -46,8 +43,6 @@ CREATE TABLE transaction_items (
     id CHAR(36) PRIMARY KEY NOT NULL,
     transaction_id CHAR(36) NOT NULL,
     book_id CHAR(36) NOT NULL,
-    late_fee DECIMAL(10,2),
-    title VARCHAR(255) NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
 );

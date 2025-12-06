@@ -70,15 +70,12 @@ export interface Notification {
 
 // user
 export interface User {
-    id?: string,
-    email: string,
-    password?: string,
-    name: string,
-    phone?: string,
-    role: "admin" | "student" | "lecturer",
-    nim?: string,
-    nip?: string,
-    year?: string,
+  id?: string;
+  email: string;
+  password?: string;
+  name: string;
+  phone?: string;
+  role: "admin" | "user";
 }
 
 // transaction

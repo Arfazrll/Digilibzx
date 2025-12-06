@@ -1,8 +1,5 @@
 package com.digilibz.controller;
 
-import com.digilibz.service.user.AdminService;
-import com.digilibz.service.user.LecturerService;
-import com.digilibz.service.user.StudentService;
 import com.digilibz.service.user.UserService;
 import com.digilibz.dto.user.*;
 import com.digilibz.models.User;
@@ -38,10 +35,7 @@ public class UserController {
                         user.getEmail(),
                         user.getName(),
                         user.getRole(),
-                        user.getPhone(),
-                        user.getNim(),
-                        user.getNip(),
-                        user.getYear()
+                        user.getPhone()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
@@ -52,20 +46,20 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getUserById(
             @Parameter(description = "ID of the user to retrieve", required = true) @PathVariable String id) {
         Optional<User> user = userService.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         UserResponseDTO response = new UserResponseDTO(
                 user.get().getId(),
                 user.get().getEmail(),
                 user.get().getName(),
                 user.get().getRole(),
-                user.get().getPhone(),
-                user.get().getNim(),
-                user.get().getNip(),
-                user.get().getYear()
+                user.get().getPhone()
         );
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update user data by id", description = "TAMBAHKAN ROLE [admin, student, lecturer]")
+    @Operation(summary = "Update user data by id", description = "Update user data")
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User newUser) {
         try {
@@ -94,33 +88,17 @@ public class UserController {
         }
     }
 
-    @Autowired
-    private StudentService studentService;
-
-    @Operation(summary = "Register a student", description = "Register a user with the role of student")
-    @PostMapping("/register/student")
-    public ResponseEntity<User> registerStudent(@Valid @RequestBody StudentRequestDTO studentDTO) {
-        User user = studentService.registerStudent(studentDTO);
+    @Operation(summary = "Register a user", description = "Register a user with the role of USER")
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRequestDTO userDTO) {
+        User user = userService.registerUser(userDTO, User.Role.USER);
         return ResponseEntity.status(201).body(user);
     }
 
-    @Autowired
-    private LecturerService lecturerService;
-
-    @Operation(summary = "Register a lecturer", description = "Register a user with the role of lecturer")
-    @PostMapping("/register/lecturer")
-    public ResponseEntity<User> registerLecturer(@Valid @RequestBody LecturerRequestDTO lecturerDTO) {
-        User user = lecturerService.registerLecturer(lecturerDTO);
-        return ResponseEntity.status(201).body(user);
-    }
-
-    @Autowired
-    private AdminService adminService;
-
-    @Operation(summary = "Register an admin", description = "Register a user with the role of admin")
+    @Operation(summary = "Register an admin", description = "Register a user with the role of ADMIN")
     @PostMapping("/register/admin")
     public ResponseEntity<User> registerAdmin(@Valid @RequestBody UserRequestDTO adminDTO) {
-        User user = adminService.registerAdmin(adminDTO);
+        User user = userService.registerUser(adminDTO, User.Role.ADMIN);
         return ResponseEntity.status(201).body(user);
     }
 }

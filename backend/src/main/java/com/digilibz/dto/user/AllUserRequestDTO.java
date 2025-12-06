@@ -9,21 +9,15 @@ public class AllUserRequestDTO {
     private String name;
     private User.Role role;
     private String phone;
-    private String nim;
-    private String nip;
-    private String year;
 
     public AllUserRequestDTO() {}
 
-    public AllUserRequestDTO(String id, String email, String name, User.Role role, String phone, String nim, String nip, String year) {
+    public AllUserRequestDTO(String id, String email, String name, User.Role role, String phone) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.role = role;
         this.phone = phone;
-        this.nim = nim;
-        this.nip = nip;
-        this.year = year;
     }
 
     public String getId() {
@@ -72,29 +66,5 @@ public class AllUserRequestDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getNim() {
-        return nim;
-    }
-
-    public void setNim(String nim) {
-        this.nim = nim;
-    }
-
-    public String getNip() {
-        return nip;
-    }
-
-    public void setNip(String nip) {
-        this.nip = nip;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public void setYear(String year) {
-        this.year = year;
     }
 }

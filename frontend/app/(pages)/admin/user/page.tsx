@@ -13,22 +13,15 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { FilePlus2, FilePenLine, Trash2, RefreshCcw } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { User } from "@/types/interfaces"
-import { deleteUserById, fetchAllUsers, registerAdmin, registerLecturer, registerStudent, updateUserById } from "@/lib/api/users"
+import { deleteUserById, fetchAllUsers, registerAdmin, registerUser, updateUserById } from "@/lib/api/users"
+import LoadingComponent from "@/components/loading"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -44,13 +37,12 @@ export default function UsersPage() {
             setUsers(data);
             setError("");
         } catch (err) {
-            setError(`Failed to load books: ${err}`);
+            setError(`Failed to load users: ${err}`);
         } finally {
             setLoading(false);
         }
     }
     
-    // Fetch Users
     useEffect(() => {
         loadUsers();
     }, []);
@@ -70,17 +62,13 @@ export default function UsersPage() {
         return matchesSearch;
     });
 
-    // Handle Add User
     const handleAddUser = async (newUser: Omit<User, "id">) => {
         try {
             setLoading(true)
             let addedUser;
             switch (newUser.role) {
-                case "student":
-                    addedUser = await registerStudent(newUser);
-                    break;
-                case "lecturer":
-                    addedUser = await registerLecturer(newUser);
+                case "user":
+                    addedUser = await registerUser(newUser);
                     break;
                 case "admin":
                     addedUser = await registerAdmin(newUser);
@@ -102,7 +90,6 @@ export default function UsersPage() {
         }
     };
 
-    // Handle Edit User
     const handleEditUser = async (editedUser: User) => {
         try {
             setLoading(true)
@@ -110,16 +97,11 @@ export default function UsersPage() {
                 throw new Error("User ID is missing or invalid");
             }
 
-            // Destrukturisasi untuk menghapus 'id' dari editedUser
             const { id, ...rest } = editedUser;
 
-            // Sanitasi data yang tersisa
             const sanitizedUser = {
                 ...rest,
                 phone: editedUser.phone || "",
-                nim: editedUser.nim || "",
-                nip: editedUser.nip || "",
-                year: editedUser.year || "",
             };
 
             const updatedUser = await updateUserById(id, sanitizedUser);
@@ -137,7 +119,6 @@ export default function UsersPage() {
         }
     };
 
-    // Handle Delete User
     const handleDeleteUser = async (id: string) => {
         toast.info('Yakin user ini dihapus?', {
             closeButton: true,
@@ -167,7 +148,6 @@ export default function UsersPage() {
         }
         return text;
     }
-    
 
     return (
         <div className="flex flex-col h-full">
@@ -210,8 +190,8 @@ export default function UsersPage() {
                 </div>
             </div>
             <div className="flex flex-col md:flex-row gap-4">
-                {["student", "lecturer", "admin"].map((item) => (
-                    <div className="flex-1 basis-1/3 overflow-auto">
+                {["user", "admin"].map((item) => (
+                    <div key={item} className="flex-1 basis-1/2 overflow-auto">
                         <Badge className="uppercase mb-3">{item}</Badge>
                         <div className="border rounded-md">
                             <ScrollArea className="h-full w-full">
@@ -280,9 +260,6 @@ interface UserFormProps {
     onSubmit: (user: User | Omit<User, 'id'>) => void
 }
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import LoadingComponent from "@/components/loading"
-
 function UserForm({ user, onSubmit }: UserFormProps) {
     const [formData, setFormData] = useState<Omit<User, "id"> | User>({
         id: "",
@@ -290,10 +267,7 @@ function UserForm({ user, onSubmit }: UserFormProps) {
         password: "",
         name: "",
         phone: "",
-        role: "student",
-        nim: "",
-        nip: "",
-        year: "",
+        role: "user",
         ...(user || {}),
     });
 
@@ -301,9 +275,7 @@ function UserForm({ user, onSubmit }: UserFormProps) {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: name === "year" || name === "quota" || name === "availableCopies" || name === "lateFee"
-                ? parseInt(value, 10) || 0
-                : value,
+            [name]: value,
         }));
     };
 
@@ -312,218 +284,85 @@ function UserForm({ user, onSubmit }: UserFormProps) {
         onSubmit(formData);
     };
 
-    // Update formData when tab is selected
     const handleTabChange = (selectedTab: string) => {
         setFormData((prevData) => ({
             ...prevData,
-            role: selectedTab as "student" | "lecturer" | "admin",
+            role: selectedTab as "user" | "admin",
         }));
     };
 
     return (
         <>
             {!user && (
-                <Tabs defaultValue="student" className="w-full" onValueChange={handleTabChange}>
-                    <TabsList className="grid w-full grid-cols-3 mb-6">
-                        <TabsTrigger value="student">Student</TabsTrigger>
-                        <TabsTrigger value="lecturer">Lecturer</TabsTrigger>
+                <Tabs defaultValue="user" className="w-full" onValueChange={handleTabChange}>
+                    <TabsList className="grid w-full grid-cols-2 mb-6">
+                        <TabsTrigger value="user">User</TabsTrigger>
                         <TabsTrigger value="admin">Admin</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="student">
-                        <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                                </div>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="md:col-span-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="phone">Phone</Label>
-                                        <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="password">Password</Label>
-                                        <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="nim">NIM</Label>
-                                        <Input id="nim" name="nim" value={formData.nim} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="year">year</Label>
-                                        <Input id="year" name="year" value={formData.year} onChange={handleChange} required />
-                                    </div>
-                                </div>
+                    <TabsContent value="user">
+                        <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2 space-y-4">
+                            <div>
+                                <Label htmlFor="name">Name</Label>
+                                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
                             </div>
-
-                            <Button type="submit" className="md:col-span-2 mt-5">
-                                Submit
-                            </Button>
-                        </form>
-                    </TabsContent>
-                    <TabsContent value="lecturer">
-                        <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                                </div>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="md:col-span-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="phone">Phone</Label>
-                                        <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="password">Password</Label>
-                                        <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <Label htmlFor="nip">NIP</Label>
-                                        <Input id="nip" name="nip" value={formData.nip} onChange={handleChange} required />
-                                    </div>
-                                </div>
+                            <div>
+                                <Label htmlFor="email">Email</Label>
+                                <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
                             </div>
-
-                            <Button type="submit" className="md:col-span-2 mt-5">
-                                Submit
-                            </Button>
+                            <div>
+                                <Label htmlFor="phone">Phone</Label>
+                                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
+                            </div>
+                            <div>
+                                <Label htmlFor="password">Password</Label>
+                                <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
+                            </div>
+                            <Button type="submit" className="mt-5">Submit</Button>
                         </form>
                     </TabsContent>
                     <TabsContent value="admin">
-                        <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                                </div>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="md:col-span-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="phone">Phone</Label>
-                                        <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="password">Password</Label>
-                                        <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                                    </div>
-                                </div>
+                        <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2 space-y-4">
+                            <div>
+                                <Label htmlFor="name">Name</Label>
+                                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
                             </div>
-
-                            <Button type="submit" className="md:col-span-2 mt-5">
-                                Submit
-                            </Button>
+                            <div>
+                                <Label htmlFor="email">Email</Label>
+                                <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
+                            </div>
+                            <div>
+                                <Label htmlFor="phone">Phone</Label>
+                                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
+                            </div>
+                            <div>
+                                <Label htmlFor="password">Password</Label>
+                                <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
+                            </div>
+                            <Button type="submit" className="mt-5">Submit</Button>
                         </form>
                     </TabsContent>
                 </Tabs>
             )}
 
-            {user && user.role == "student" && (
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="md:col-span-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="nim">NIM</Label>
-                                <Input id="nim" name="nim" value={formData.nim} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="year">year</Label>
-                                <Input id="year" name="year" value={formData.year} onChange={handleChange} required />
-                            </div>
-                        </div>
+            {user && (
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2 space-y-4">
+                    <div>
+                        <Label htmlFor="name">Name</Label>
+                        <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
                     </div>
-
-                    <Button type="submit" className="md:col-span-2 mt-5">
-                        Submit
-                    </Button>
-                </form>
-            )}
-
-            {user && user.role == "lecturer" && (
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="md:col-span-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                            </div>
-                            <div className="md:col-span-2">
-                                <Label htmlFor="nip">NIP</Label>
-                                <Input id="nip" name="nip" value={formData.nip} onChange={handleChange} required />
-                            </div>
-                        </div>
+                    <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
                     </div>
-
-                    <Button type="submit" className="md:col-span-2 mt-5">
-                        Submit
-                    </Button>
-                </form>
-            )}
-
-            {user && user.role == "admin" && (
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 p-2">
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="md:col-span-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" name="email" value={formData.email} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" name="password" value={formData.password} onChange={handleChange} required />
-                            </div>
-                        </div>
+                    <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
                     </div>
-
-                    <Button type="submit" className="md:col-span-2 mt-5">
-                        Submit
-                    </Button>
+                    <div>
+                        <Label htmlFor="password">Password</Label>
+                        <Input id="password" name="password" value={formData.password} onChange={handleChange} />
+                    </div>
+                    <Button type="submit" className="mt-5">Submit</Button>
                 </form>
             )}
         </>

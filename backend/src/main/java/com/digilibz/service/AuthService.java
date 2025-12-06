@@ -19,7 +19,7 @@ public class AuthService {
         User user = (User) userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole() == User.Role.admin) {
+        if (user.getRole() == User.Role.ADMIN) {
             throw new RuntimeException("Unauthorized: Use admin login page");
         }
 
@@ -35,7 +35,7 @@ public class AuthService {
         User user = (User) userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
-        if (user.getRole() != User.Role.admin) {
+        if (user.getRole() != User.Role.ADMIN) {
             throw new RuntimeException("Unauthorized: Admin access only");
         }
 
