@@ -14,16 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeftRight, ChevronDown, ChevronUp, CircleCheckBigIcon, Loader2, Trash2 } from 'lucide-react';
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { ArrowLeftRight, ChevronDown, ChevronUp, Clock, Loader2 } from 'lucide-react';
 import { Transaction } from "@/types/interfaces";
 import React from "react";
 import InvoiceComponent from "@/components/user-page/borrow/invoice";
@@ -35,8 +27,6 @@ import { Badge } from "@/components/ui/badge";
 
 export default function ReturnPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [type, setType] = useState<"all" | "borrow" | "return">("all");
-    const [status, setStatus] = useState<"all" | "pending" | "approved" | "declined" | "overdue">("all");
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -47,19 +37,17 @@ export default function ReturnPage() {
 
     const handleReviewSubmit = async (review: any) => {
         try {
-            console.log(selectedBookId)
-            // Submit the review using the API
             await submitReview(selectedBookId, review);
-            toast("Review submitted successfully!");
-            setShowReviewForm(false); // Hide the form after success
+            toast.success("Review berhasil dikirim!");
+            setShowReviewForm(false);
         } catch (err) {
             console.error("Failed to submit review:", err);
-            toast("Failed to submit review. Please try again.");
+            toast.error("Gagal mengirim review. Silakan coba lagi.");
         }
     };
 
     const handleShowReviewForm = (bookId: string) => {
-        if (bookId == selectedBookId && showReviewForm) {
+        if (bookId === selectedBookId && showReviewForm) {
             setShowReviewForm(false);
         } else {
             setSelectedBookId(bookId);
@@ -74,14 +62,14 @@ export default function ReturnPage() {
         try {
             const data = await fetchTransactions({
                 search: search,
-                type: type,
-                status: status,
+                type: "all",
+                status: "all",
                 userId: userId,
             });
             setTransactions(data);
         } catch (err) {
             console.error("Error fetching transactions:", err);
-            setError("Failed to fetch transactions.");
+            setError("Gagal memuat data transaksi.");
         } finally {
             setLoading(false);
         }
@@ -91,43 +79,67 @@ export default function ReturnPage() {
         setExpandedRow(expandedRow === id ? null : id);
     };
 
+    const getDaysRemaining = (dateTo: string) => {
+        const today = new Date();
+        const endDate = new Date(dateTo);
+        const diffTime = endDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    };
+
     useEffect(() => {
         const userId: string = localStorage.getItem("userId") || "";
         setUserId(userId);
         fetchData(userId);
-    }, [search, type, status]);
+    }, [search]);
+
+    const filteredTransactions = transactions.filter((transaction) => {
+        const isApprovedBorrow = transaction.status.toLowerCase() === "approved" && transaction.type.toLowerCase() === "borrow";
+        const isReturn = transaction.type.toLowerCase() === "return";
+        return isApprovedBorrow || isReturn;
+    });
 
     return (
         <div className="flex flex-col h-full">
             <div className="space-y-6 mb-6">
-                <h1 className="text-3xl font-bold">Pengembalian</h1>
-                <div className="flex flex-row justify-center items-end gap-4">
-                    <div className="flex-1">
-                        <Label htmlFor="search">Search</Label>
-                        <Input
-                            id="search"
-                            placeholder="Search transactions"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                <div>
+                    <h1 className="text-3xl font-bold">Pengembalian Buku</h1>
+                    <p className="text-muted-foreground mt-2">Kelola pengembalian buku yang Anda pinjam</p>
+                </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg bg-blue-50">
+                        <p className="text-sm text-muted-foreground">Sedang Dipinjam</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                            {transactions.filter(t => t.status.toLowerCase() === "approved" && t.type.toLowerCase() === "borrow").length}
+                        </p>
                     </div>
-                    <div>
-                        <Label htmlFor="status">Status</Label>
-                        <Select value={status.toLowerCase()} onValueChange={(value: "all" | "pending" | "approved" | "declined" | "overdue") => setStatus(value)}>
-                            <SelectTrigger id="status" className="w-[180px]">
-                                <SelectValue placeholder="Filter transactions" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="declined">Declined</SelectItem>
-                                <SelectItem value="overdue">Overdue</SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <div className="p-4 border rounded-lg bg-yellow-50">
+                        <p className="text-sm text-muted-foreground">Menunggu Approval</p>
+                        <p className="text-2xl font-bold text-yellow-600">
+                            {transactions.filter(t => t.status.toLowerCase() === "pending" && t.type.toLowerCase() === "return").length}
+                        </p>
+                    </div>
+                    <div className="p-4 border rounded-lg bg-green-50">
+                        <p className="text-sm text-muted-foreground">Sudah Dikembalikan</p>
+                        <p className="text-2xl font-bold text-green-600">
+                            {transactions.filter(t => t.status.toLowerCase() === "approved" && t.type.toLowerCase() === "return").length}
+                        </p>
                     </div>
                 </div>
+
+                <div className="flex-1">
+                    <Label htmlFor="search">Cari</Label>
+                    <Input
+                        id="search"
+                        placeholder="Cari berdasarkan invoice atau judul buku"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
             </div>
+
             <div className="flex-grow overflow-auto border rounded-md">
                 {loading ? (
                     <div className="flex justify-center items-center h-full">
@@ -135,32 +147,31 @@ export default function ReturnPage() {
                     </div>
                 ) : error ? (
                     <div className="text-center text-red-500">{error}</div>
+                ) : filteredTransactions.length === 0 ? (
+                    <div className="text-center text-muted-foreground p-8">
+                        Tidak ada buku yang perlu dikembalikan
+                    </div>
                 ) : (
                     <Table>
-                        <TableCaption>A list of recent transactions.</TableCaption>
+                        <TableCaption>Daftar buku yang perlu dikembalikan</TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>User</TableHead>
-                                <TableHead>Date Range</TableHead>
-                                <TableHead>Total Fee</TableHead>
+                                <TableHead>Invoice</TableHead>
+                                <TableHead>Periode Pinjam</TableHead>
+                                <TableHead>Sisa Waktu</TableHead>
+                                <TableHead>Total</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead>Payment</TableHead>
-                                <TableHead>Actions</TableHead>
+                                <TableHead>Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactions
-                                .filter((transaction) => {
-                                    const dateIsPast = new Date(transaction.dateRange.to) < new Date();
-                                    const isApprovedBorrow = transaction.status.toLowerCase() === "approved" && transaction.type.toLowerCase() === "borrow";
-                                    const isReturn = transaction.type.toLowerCase() === "return";
-                                    return (dateIsPast && (isApprovedBorrow || isReturn));
-                                }).map((transaction) => (
+                            {filteredTransactions.map((transaction) => {
+                                const daysRemaining = getDaysRemaining(transaction.dateRange.to);
+                                const isOverdue = daysRemaining < 0;
+
+                                return (
                                 <React.Fragment key={transaction.id}>
-                                    {/* Main Row */}
-                                    <TableRow>
+                                    <TableRow className={isOverdue && transaction.type.toLowerCase() === "borrow" ? "bg-red-50" : ""}>
                                         <TableCell>
                                             <Dialog>
                                                 <DialogTrigger asChild>
@@ -169,9 +180,6 @@ export default function ReturnPage() {
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className="max-w-4xl w-full overflow-y-auto">
-                                                    {/* <DialogHeader>
-                                                        <DialogTitle>Transaction ID: {transaction.id}</DialogTitle>
-                                                    </DialogHeader> */}
                                                     <div className="max-h-[70vh] overflow-y-auto">
                                                         <InvoiceComponent invoiceCode={transaction.invoiceCode} />
                                                     </div>
@@ -179,102 +187,101 @@ export default function ReturnPage() {
                                             </Dialog>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">{transaction.user.name}</span>
-                                                <span className="text-sm text-muted-foreground">{transaction.user.email}</span>
-                                                <span className="text-sm text-muted-foreground">{transaction.user.phone}</span>
-                                            </div>
+                                            <p className="text-sm">{new Date(transaction.dateRange.from).toLocaleDateString("id-ID")}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                s/d {new Date(transaction.dateRange.to).toLocaleDateString("id-ID")}
+                                            </p>
                                         </TableCell>
                                         <TableCell>
-                                            <p>{new Date(transaction.dateRange.from).toLocaleDateString()}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                to {new Date(transaction.dateRange.to).toLocaleDateString()}
-                                            </p>
+                                            {transaction.type.toLowerCase() === "borrow" && (
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className={`h-4 w-4 ${isOverdue ? "text-red-500" : daysRemaining <= 3 ? "text-yellow-500" : "text-green-500"}`} />
+                                                    <span className={`font-medium ${isOverdue ? "text-red-600" : daysRemaining <= 3 ? "text-yellow-600" : ""}`}>
+                                                        {isOverdue ? `Terlambat ${Math.abs(daysRemaining)} hari` : `${daysRemaining} hari lagi`}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {transaction.type.toLowerCase() === "return" && (
+                                                <span className="text-sm text-muted-foreground">-</span>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <p className="font-medium">
-                                                Rp{transaction.totalFee.toLocaleString()}
+                                                Rp{transaction.totalFee.toLocaleString("id-ID")}
                                             </p>
                                         </TableCell>
                                         <TableCell>
-                                            <span
-                                                className={`px-2 py-1 rounded-full text-xs font-semibold ${transaction.status.toLowerCase() === "approved"
-                                                    ? "bg-green-100 text-green-800"
-                                                    : transaction.status.toLowerCase() === "pending"
-                                                        ? "bg-gray-100 text-gray-800"
-                                                        : transaction.status.toLowerCase() === "declined"
-                                                            ? "bg-red-100 text-red-800"
-                                                            : "bg-yellow-100 text-yellow-800"
-                                                    }`}
-                                            >
-                                                {transaction.status.toLowerCase()}
-                                            </span>
+                                            {transaction.type.toLowerCase() === "borrow" ? (
+                                                <Badge variant="destructive">Sedang Dipinjam</Badge>
+                                            ) : transaction.status.toLowerCase() === "pending" ? (
+                                                <Badge variant="secondary">Menunggu Approval</Badge>
+                                            ) : (
+                                                <Badge variant="default">Sudah Dikembalikan</Badge>
+                                            )}
                                         </TableCell>
-                                        <TableCell>{transaction.type.toLowerCase() === "borrow" ? (
-                                            <Badge variant="destructive">Borrow</Badge>
-                                        ) : (
-                                            <Badge>Return</Badge>
-                                        )}</TableCell>
-                                        <TableCell>{transaction.paymentMethod}</TableCell>
                                         <TableCell>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => toggleRow(transaction.id)}
-                                            >
-                                                {expandedRow === transaction.id ? <ChevronUp /> : <ChevronDown />}
-                                            </Button>
-                                            {(transaction.type.toLowerCase() == "return" && transaction.status.toLowerCase() == "pending") && (
-                                                    <Button size="icon" onClick={async () => {
-                                                        try {
-                                                            // Call API to update status
-                                                            await fetchUpdateStatusTransaction(transaction.invoiceCode, "approved", "return");
-                                                            toast.success(`Status updated to PENDING and RETURN for ${transaction.invoiceCode}`);
-                                                            // Refresh the transaction list
-                                                            await fetchData(userId);
-                                                        } catch (err) {
-                                                            console.error("Failed to update status:", err);
-                                                            toast.error("Failed to update status. Please try again.");
-                                                        }
-                                                    }}>
-                                                        <CircleCheckBigIcon/>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => toggleRow(transaction.id)}
+                                                >
+                                                    {expandedRow === transaction.id ? <ChevronUp /> : <ChevronDown />}
+                                                </Button>
+                                                {(transaction.type.toLowerCase() === "borrow" && transaction.status.toLowerCase() === "approved") && (
+                                                    <Button 
+                                                        size="sm"
+                                                        className="gap-2"
+                                                        onClick={async () => {
+                                                            try {
+                                                                await fetchUpdateStatusTransaction(transaction.invoiceCode, "pending", "return");
+                                                                toast.success(`Permintaan pengembalian untuk ${transaction.invoiceCode} berhasil dikirim`);
+                                                                await fetchData(userId);
+                                                            } catch (err) {
+                                                                console.error("Failed to update status:", err);
+                                                                toast.error("Gagal mengirim permintaan. Silakan coba lagi.");
+                                                            }
+                                                        }}
+                                                    >
+                                                        <ArrowLeftRight className="h-4 w-4"/>
+                                                        Kembalikan
                                                     </Button>
                                                 )}
+                                            </div>
                                         </TableCell>
                                     </TableRow>
 
-                                    {/* Expanded Row for Items */}
                                     {expandedRow === transaction.id && (
                                         <TableRow className="bg-muted/50">
-                                            <TableCell colSpan={8}>
-                                                <div className="grid grid-cols-2 gap-4 p-4">
-                                                    {transaction.items.map((item) => (
-                                                        <div className="flex flex-col p-2 border rounded bg-white max-h-fit">
-                                                            <div className="flex items-center gap-4">
-                                                                <img
-                                                                    src={item.image}
-                                                                    alt={item.title}
-                                                                    className="w-12 h-12 object-cover rounded"
-                                                                />
-                                                                <div>
-                                                                    <p className="font-medium">{item.title}</p>
-                                                                    <p className="text-sm text-muted-foreground">by {item.author}</p>
+                                            <TableCell colSpan={6}>
+                                                <div className="p-4">
+                                                    <h4 className="font-semibold mb-3">Buku yang Dipinjam:</h4>
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        {transaction.items.map((item) => (
+                                                            <div key={item.id} className="flex flex-col p-3 border rounded bg-white">
+                                                                <div className="flex items-center gap-4">
+                                                                    <img
+                                                                        src={item.image}
+                                                                        alt={item.title}
+                                                                        className="w-16 h-20 object-cover rounded"
+                                                                    />
+                                                                    <div className="flex-1">
+                                                                        <p className="font-medium text-lg">{item.title}</p>
+                                                                        <p className="text-sm text-muted-foreground">oleh {item.author}</p>
+                                                                    </div>
+                                                                    {(transaction.status.toLowerCase() === "approved" && transaction.type.toLowerCase() === "return") && (
+                                                                        <Button
+                                                                            onClick={() => handleShowReviewForm(item.id)}
+                                                                            variant="outline"
+                                                                            className="px-4"
+                                                                        >
+                                                                            Tulis Review
+                                                                        </Button>
+                                                                    )}
                                                                 </div>
-                                                                {(transaction.status.toLowerCase() == 'approved' || transaction.status.toLowerCase() == 'overdue') && (
-                                                                    <Button
-                                                                        onClick={() => handleShowReviewForm(item.id)}
-                                                                        type="submit"
-                                                                        className="ml-auto px-4 py-2"
-                                                                    >
-                                                                        Review
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                            {showReviewForm && selectedBookId === item.id && (
-                                                                <div className="mt-3">
-                                                                    <Separator className="md:block" />
-                                                                    <div className="m-4">
-                                                                        {/* <h3 className="text-lg font-semibold">Review Form</h3> */}
+                                                                {showReviewForm && selectedBookId === item.id && (
+                                                                    <div className="mt-4">
+                                                                        <Separator className="mb-4" />
                                                                         <BookReviewForm
                                                                             bookId={selectedBookId}
                                                                             onSubmit={(reviewData) => {
@@ -282,17 +289,16 @@ export default function ReturnPage() {
                                                                             }}
                                                                         />
                                                                     </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                    ))}
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
                                     )}
                                 </React.Fragment>
-                            ))}
+                            )})}
                         </TableBody>
                     </Table>
                 )}

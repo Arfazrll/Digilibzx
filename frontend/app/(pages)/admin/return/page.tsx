@@ -62,7 +62,6 @@ export default function ReturnPage() {
         setExpandedRow(expandedRow === id ? null : id);
     };
 
-
     const handleTypeButton = () => {
         toast("are you sure?")
     }
@@ -145,15 +144,13 @@ export default function ReturnPage() {
                         <TableBody>
                             {transactions
                                 .filter((transaction) => {
-                                    const dateIsPast = new Date(transaction.dateRange.to) < new Date();
-                                    const isApprovedBorrow = transaction.status.toLowerCase() === "approved" && transaction.type.toLowerCase() === "borrow";
                                     const isReturn = transaction.type.toLowerCase() === "return";
-                                    return (dateIsPast && (isApprovedBorrow || isReturn));
+                                    const isApprovedBorrow = transaction.status.toLowerCase() === "approved" && transaction.type.toLowerCase() === "borrow";
+                                    return isReturn || isApprovedBorrow;
                                 })
                                 .map((transaction) => (
                                     <React.Fragment key={transaction.id}>
-                                        {/* Main Row */}
-                                        <TableRow className={transaction.type.toLowerCase() == "borrow" ? "bg-red-200" : transaction.status.toLowerCase() == "declined" ? "bg-yellow-200" : "bg-green-200"}>
+                                        <TableRow className={transaction.type.toLowerCase() === "borrow" ? "bg-red-200" : transaction.status.toLowerCase() === "declined" ? "bg-yellow-200" : transaction.status.toLowerCase() === "pending" ? "bg-blue-100" : "bg-green-200"}>
                                             <TableCell>
                                                 <Dialog>
                                                     <DialogTrigger asChild>
@@ -162,9 +159,6 @@ export default function ReturnPage() {
                                                         </Button>
                                                     </DialogTrigger>
                                                     <DialogContent className="max-w-4xl w-full overflow-y-auto">
-                                                        {/* <DialogHeader>
-                                                        <DialogTitle>Transaction ID: {transaction.id}</DialogTitle>
-                                                    </DialogHeader> */}
                                                         <div className="max-h-[70vh] overflow-y-auto">
                                                             <InvoiceComponent invoiceCode={transaction.invoiceCode} />
                                                         </div>
@@ -193,9 +187,9 @@ export default function ReturnPage() {
                                                 <span
                                                     className={`px-2 py-1 rounded-full text-xs font-semibold ${transaction.status.toLowerCase() === "approved"
                                                         ? "bg-green-100 text-green-800"
-                                                        : transaction.status.toLowerCase() == "pending"
+                                                        : transaction.status.toLowerCase() === "pending"
                                                             ? "bg-gray-100 text-gray-800"
-                                                            : transaction.status.toLowerCase() == "declined"
+                                                            : transaction.status.toLowerCase() === "declined"
                                                                 ? "bg-red-100 text-red-800"
                                                                 : "bg-yellow-100 text-yellow-800"
                                                         }`}
@@ -218,39 +212,49 @@ export default function ReturnPage() {
                                                 >
                                                     {expandedRow === transaction.id ? <ChevronUp /> : <ChevronDown />}
                                                 </Button>
-                                                {(transaction.type.toLowerCase() == "borrow" && transaction.status.toLowerCase() != "pending") && (
+                                                {(transaction.type.toLowerCase() === "borrow" && transaction.status.toLowerCase() !== "pending") && (
                                                     <Button size="icon" onClick={async () => {
                                                         try {
-                                                            // Call API to update status
                                                             await fetchUpdateStatusTransaction(transaction.invoiceCode, "pending", "return");
                                                             toast.success(`Status updated to PENDING and RETURN for ${transaction.invoiceCode}`);
-                                                            // Refresh the transaction list
                                                             await fetchData();
                                                         } catch (err) {
                                                             console.error("Failed to update status:", err);
                                                             toast.error("Failed to update status. Please try again.");
                                                         }
                                                     }}>
-                                                        <ArrowLeftRight/>
+                                                        <ArrowLeftRight />
                                                     </Button>
                                                 )}
-                                                {(transaction.type.toLowerCase() == "return" && transaction.status.toLowerCase() == "approved") && (
+                                                {(transaction.type.toLowerCase() === "return" && transaction.status.toLowerCase() === "pending") && (
+                                                    <Button size="icon" variant="default" onClick={async () => {
+                                                        try {
+                                                            await fetchUpdateStatusTransaction(transaction.invoiceCode, "approved", "return");
+                                                            toast.success(`Return APPROVED for ${transaction.invoiceCode}`);
+                                                            await fetchData();
+                                                        } catch (err) {
+                                                            console.error("Failed to approve:", err);
+                                                            toast.error("Failed to approve return.");
+                                                        }
+                                                    }}>
+                                                        <ChevronUp />
+                                                    </Button>
+                                                )}
+                                                {(transaction.type.toLowerCase() === "return" && transaction.status.toLowerCase() === "approved") && (
                                                     <Button size="icon" variant='destructive' onClick={async () => {
                                                         try {
-                                                            // Call API to update status
                                                             await fetchUpdateStatusTransaction(transaction.invoiceCode, "declined", "return");
                                                             toast.success(`Status updated to DECLINED and RETURN for ${transaction.invoiceCode}`);
-                                                            // Refresh the transaction list
                                                             await fetchData();
                                                         } catch (err) {
                                                             console.error("Failed to update status:", err);
                                                             toast.error("Failed to update status. Please try again.");
                                                         }
                                                     }}>
-                                                        <CircleXIcon/>
+                                                        <CircleXIcon />
                                                     </Button>
                                                 )}
-                                                {(transaction.type.toLowerCase() == "return" && transaction.status.toLowerCase() == "declined") && (
+                                                {(transaction.type.toLowerCase() === "return" && transaction.status.toLowerCase() === "declined") && (
                                                     <Button size="icon" variant='destructive' onClick={async () => {
                                                         toast.info(
                                                             <div className="flex flex-col">
@@ -260,13 +264,12 @@ export default function ReturnPage() {
                                                             </div>
                                                         )
                                                     }}>
-                                                        <Phone/>
+                                                        <Phone />
                                                     </Button>
                                                 )}
                                             </TableCell>
                                         </TableRow>
 
-                                        {/* Expanded Row for Items */}
                                         {expandedRow === transaction.id && (
                                             <TableRow>
                                                 <TableCell colSpan={8}>
@@ -293,7 +296,6 @@ export default function ReturnPage() {
                                                             ))}
                                                         </div>
 
-                                                        {/* Dropdown for Changing Status */}
                                                         <div className="flex items-center gap-4">
                                                             <Label htmlFor={`status-${transaction.id}`} className="font-medium">
                                                                 Change Status:
@@ -302,10 +304,8 @@ export default function ReturnPage() {
                                                                 value={transaction.status.toLowerCase()}
                                                                 onValueChange={async (newStatus: "pending" | "approved" | "declined" | "overdue") => {
                                                                     try {
-                                                                        // Call API to update status
                                                                         await fetchUpdateStatusTransaction(transaction.invoiceCode, newStatus);
                                                                         toast.success(`Status updated to ${newStatus}`);
-                                                                        // Refresh the transaction list
                                                                         await fetchData();
                                                                     } catch (err) {
                                                                         console.error("Failed to update status:", err);

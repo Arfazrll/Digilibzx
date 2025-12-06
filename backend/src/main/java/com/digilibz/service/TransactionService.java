@@ -183,64 +183,75 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findByInvoiceCode(invoiceCode)
                 .orElseThrow(() -> new IllegalArgumentException("Transaksi dengan kode invoice tidak ditemukan"));
 
-        if (!List.of("approved", "declined", "pending").contains(status.toLowerCase())) {
-            throw new IllegalArgumentException("Status tidak valid. Gunakan 'approved', 'declined', atau 'pending'");
+        if (!List.of("approved", "declined", "pending", "overdue").contains(status.toLowerCase())) {
+            throw new IllegalArgumentException("Status tidak valid. Gunakan 'approved', 'declined', 'pending', atau 'overdue'");
         }
 
         transaction.setStatus(Transaction.TransactionStatus.valueOf(status.toUpperCase()));
 
-        if (!typeIn.isEmpty()) {
+        if (typeIn != null && !typeIn.isEmpty()) {
+            if (!List.of("borrow", "return").contains(typeIn.toLowerCase())) {
+                throw new IllegalArgumentException("Tipe transaksi tidak valid. Gunakan 'borrow' atau 'return'");
+            }
             transaction.setType(Transaction.TransactionType.valueOf(typeIn.toUpperCase()));
         }
 
         transactionRepository.save(transaction);
 
         User user = transaction.getUser();
+        String currentType = transaction.getType().toString().toLowerCase();
 
         String title;
         String message;
-        Notification.NotificationType type;
+        Notification.NotificationType notificationType;
 
-        if ("borrow".equalsIgnoreCase(typeIn)) {
+        if ("borrow".equalsIgnoreCase(currentType)) {
             switch (status.toLowerCase()) {
                 case "approved":
                     title = "Borrow Request Approved";
                     message = "Your borrow request with invoice code " + invoiceCode + " has been approved.";
-                    type = Notification.NotificationType.REMINDER;
+                    notificationType = Notification.NotificationType.REMINDER;
                     break;
                 case "declined":
                     title = "Borrow Request Declined";
                     message = "Your borrow request with invoice code " + invoiceCode + " has been declined. Please contact support for details.";
-                    type = Notification.NotificationType.ALERT;
+                    notificationType = Notification.NotificationType.ALERT;
+                    break;
+                case "overdue":
+                    title = "Borrow Request Overdue";
+                    message = "Your borrow request with invoice code " + invoiceCode + " is overdue. Please return the books immediately.";
+                    notificationType = Notification.NotificationType.ALERT;
                     break;
                 default:
                     title = "Borrow Request Pending";
                     message = "Your borrow request with invoice code " + invoiceCode + " is pending and will be reviewed by an admin.";
-                    type = Notification.NotificationType.INFO;
+                    notificationType = Notification.NotificationType.INFO;
                     break;
             }
-        } else if ("return".equalsIgnoreCase(typeIn)) {
+        } else {
             switch (status.toLowerCase()) {
                 case "approved":
                     title = "Return Approved";
                     message = "Your return request with invoice code " + invoiceCode + " has been approved.";
-                    type = Notification.NotificationType.REMINDER;
+                    notificationType = Notification.NotificationType.REMINDER;
                     break;
                 case "declined":
                     title = "Return Declined";
                     message = "Return request with invoice code " + invoiceCode + " has been declined. Please contact support for details.";
-                    type = Notification.NotificationType.ALERT;
+                    notificationType = Notification.NotificationType.ALERT;
+                    break;
+                case "overdue":
+                    title = "Return Overdue";
+                    message = "Return request with invoice code " + invoiceCode + " is overdue. Please complete the return process immediately.";
+                    notificationType = Notification.NotificationType.ALERT;
                     break;
                 default:
                     title = "Return Pending";
                     message = "Return request with invoice code " + invoiceCode + " is pending and you should return it and approve it.";
-                    type = Notification.NotificationType.INFO;
+                    notificationType = Notification.NotificationType.INFO;
                     break;
             }
-        } else {
-            throw new IllegalArgumentException("Tipe transaksi tidak valid. Gunakan 'borrow' atau 'return'.");
         }
-
-        notificationService.addNotification(user, title, message, type);
+        notificationService.addNotification(user, title, message, notificationType);
     }
 }
