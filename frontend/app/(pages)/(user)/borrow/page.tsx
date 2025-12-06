@@ -36,7 +36,7 @@ export default function CheckoutPage() {
 
     const bankAccount = {
         'norek': '901556823268',
-        'nama': 'Gagas Surya Laksana'
+        'nama': 'Syahril Arfian Almazril'
     };
 
     const refreshData = () => {

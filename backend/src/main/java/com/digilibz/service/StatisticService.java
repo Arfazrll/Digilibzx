@@ -2,6 +2,7 @@ package com.digilibz.service;
 
 import com.digilibz.repository.*;
 import com.digilibz.dto.review.ReviewDTO;
+import com.digilibz.models.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class StatisticService {
   }
 
   public Long getJumlahUserNow() {
-    return userRepository.count();
+    return userRepository.countByRole(User.Role.USER); // hanya USER
   }
 
   public long getStatisticBook() {

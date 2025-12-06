@@ -16,7 +16,7 @@ public class AuthService {
     }
 
     public User login(String email, String password) {
-        User user = (User) userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getRole() == User.Role.ADMIN) {
@@ -32,7 +32,7 @@ public class AuthService {
     }
 
     public User loginAdmin(String email, String password) {
-        User user = (User) userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
         if (user.getRole() != User.Role.ADMIN) {

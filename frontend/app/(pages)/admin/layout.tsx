@@ -45,16 +45,16 @@ export default function AdminLayout({ children, page }: AdminLayoutProps) {
 
       const hour = now.getHours()
       if (hour >= 5 && hour < 12) {
-        setGreeting("Selamat Pagi")
+        setGreeting("Good Morning")
         setIcon(<Sun className="text-yellow-500" />)
       } else if (hour >= 12 && hour < 15) {
-        setGreeting("Selamat Siang")
+        setGreeting("Good Afternoon")
         setIcon(<Sun className="text-yellow-600" />)
       } else if (hour >= 15 && hour < 18) {
-        setGreeting("Selamat Sore")
+        setGreeting("Good Evening")
         setIcon(<Cloud className="text-orange-500" />)
       } else {
-        setGreeting("Selamat Malam")
+        setGreeting("Good Night")
         setIcon(<Moon className="text-blue-500" />)
       }
     }

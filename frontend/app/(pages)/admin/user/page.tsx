@@ -190,14 +190,14 @@ export default function UsersPage() {
                 </div>
             </div>
             <div className="flex flex-col md:flex-row gap-4">
-                {["user", "admin"].map((item) => (
+                {["USER", "ADMIN"].map((item) => (  // ✅ Gunakan UPPERCASE
                     <div key={item} className="flex-1 basis-1/2 overflow-auto">
                         <Badge className="uppercase mb-3">{item}</Badge>
                         <div className="border rounded-md">
                             <ScrollArea className="h-full w-full">
                                 <div className="w-full min-w-max">
                                     <Table>
-                                        <TableCaption>A list of {item} in the library.</TableCaption>
+                                        <TableCaption>A list of {item.toLowerCase()} in the library.</TableCaption>
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="w-[40px]">ID</TableHead>
@@ -208,7 +208,7 @@ export default function UsersPage() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {filteredUsers.filter((u) => u.role === item).map((user) => (
+                                            {filteredUsers.filter((u) => u.role === item).map((user) => (  // ✅ Sekarang match!
                                                 <TableRow key={user.id}>
                                                     <TableCell className="font-medium">{truncateText(user.id, 5)}</TableCell>
                                                     <TableCell>{user.name}</TableCell>
@@ -223,7 +223,7 @@ export default function UsersPage() {
                                                             </DialogTrigger>
                                                             <DialogContent className="max-w-xl w-full overflow-y-auto">
                                                                 <DialogHeader>
-                                                                    <DialogTitle>Edit user [{item}]</DialogTitle>
+                                                                    <DialogTitle>Edit user [{item.toLowerCase()}]</DialogTitle>
                                                                 </DialogHeader>
                                                                 {editingUser && (
                                                                     <ScrollArea className="max-h-[70vh] overflow-y-auto">
