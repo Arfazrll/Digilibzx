@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       (u: User) =>
         u.email === email &&
         u.password === password &&
-        (u.role === "student" || u.role === "lecturer")
+        (u.role === "user")
     );    
 
     if (user) {

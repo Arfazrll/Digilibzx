@@ -34,7 +34,7 @@ export const transactions: Transaction[] = [
             email: 'student@university.com',
             name: 'Jane Doe',
             phone: '0812345678',
-            role: 'student'
+            role: 'user'
         }
     },
     {
@@ -70,7 +70,7 @@ export const transactions: Transaction[] = [
             email: 'student@university.com',
             name: 'Jane Doe',
             phone: '0812345678',
-            role: 'student'
+            role: 'user'
         }
     },
     {
@@ -106,7 +106,7 @@ export const transactions: Transaction[] = [
             email: 'student@university.com',
             name: 'Jane Doe',
             phone: '0812345678',
-            role: 'student'
+            role: 'user'
         }
     },
     {
@@ -149,7 +149,7 @@ export const transactions: Transaction[] = [
             email: 'student@university.com',
             name: 'Jane Doe',
             phone: '0812345678',
-            role: 'student'
+            role: 'user'
         }
     }
 ];

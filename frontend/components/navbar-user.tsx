@@ -45,7 +45,7 @@ import { Cart } from "./user-page/borrow/cart";
 import { fetchNotificationsByUserId } from "@/lib/api/notifications";
 import { Notification } from "@/types/interfaces";
 
-const webName = "BookWise"
+const webName = "Digilibz"
 
 const subMenuItemsOne = [
   {

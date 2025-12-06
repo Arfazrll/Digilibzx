@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Book Wise",
+  title: "Digilibz - Your Digital Library",
   description: "Make your nerd life easier",
 };
 

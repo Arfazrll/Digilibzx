@@ -7,9 +7,7 @@ interface User {
   email: string;
   password: string;
   phone?: string;
-  role: "student";
-  nim: string;
-  year: string;
+  role: "user";
 }
 
 const generateUniqueId = () => Math.random().toString(36).substring(2, 15);
@@ -42,21 +40,19 @@ export async function POST(request: Request) {
       email: body.email,
       password: body.password,
       phone: body.phone || "",
-      role: "student",
-      nim: body.nim,
-      year: body.year,
+      role: "user",
     };
 
     users.push(newUser);
 
     return NextResponse.json(
-      { message: "Mahasiswa berhasil terdaftar", user: newUser },
+      { message: "User berhasil terdaftar", user: newUser },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error during student registration:", error);
+    console.error("Error during user registration:", error);
     return NextResponse.json(
-      { error: "Terjadi kesalahan saat registrasi mahasiswa" },
+      { error: "Terjadi kesalahan saat registrasi User" },
       { status: 500 }
     );
   }

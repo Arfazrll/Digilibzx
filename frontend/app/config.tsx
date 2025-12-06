@@ -1,5 +1,5 @@
 export const appInfo = {
-  "appName": "Book Wise",
+  "appName": "Digilibz",
   "tagLine": "Borrow a book more easier."
 }
 

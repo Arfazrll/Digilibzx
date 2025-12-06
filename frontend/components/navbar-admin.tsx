@@ -43,7 +43,7 @@ import { assets } from '@/app/config';
 import { Input } from './ui/input';
 import { Cart } from "./user-page/borrow/cart";
 
-const webName = "BookWise"
+const webName = "Digilibz"
 
 
 const subMenuItemsOne = [

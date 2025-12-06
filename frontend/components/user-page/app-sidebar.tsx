@@ -258,7 +258,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
             </div>
             <div>
               <h4 className="font-semibold">Need help?</h4>
-              <p className="text-sm text-gray-500">Contact our helpdesk</p>
+              <p className="text-sm text-gray-500">Contact our Team</p>
             </div>
           </div>
           <Link href="https://wa.me/6282232335782">

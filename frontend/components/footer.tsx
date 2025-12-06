@@ -40,7 +40,7 @@ const Footer = () => {
                         ))}
                     </div>
                     <div className="lg:mt-24 flex flex-col justify-between gap-4 border-t pt-8 text-sm font-medium text-muted-foreground md:flex-row md:items-center">
-                        <p>© 2024 {appInfo.appName}. All rights reserved.</p>
+                        <p>© 2025 {appInfo.appName}. All rights reserved.</p>
                         <ul className="flex gap-4">
                             {footerContents.bottomContent.map((content, id) => (
                                 <li key={id} className="underline hover:text-primary">

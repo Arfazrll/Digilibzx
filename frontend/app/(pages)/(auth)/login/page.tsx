@@ -56,7 +56,7 @@ export default function LoginPage() {
       description: (
         <pre className="text-sm whitespace-pre-wrap">
           <code>
-            {JSON.stringify({ mahasiswa: { email: "mahasiswa@student.com", password: "mahasiswa123" }, dosen: { email: "dosen@lecturer.com", password: "dosen123" }}, null, 2)}
+            {JSON.stringify({ user: { email: "User@gmail.com", password: "user123" }, }, null, 2)}
           </code>
         </pre>
       ),
