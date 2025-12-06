@@ -18,7 +18,7 @@ public class UserRequestDTO {
     @Schema(description = "Name of the user", example = "John Doe")
     private String name;
 
-    @Schema(description = "Role of the user (admin, student, lecturer)", example = "student", defaultValue = "student", hidden = true)
+    @Schema(description = "Role of the user (admin, user)", example = "user", defaultValue = "user", hidden = true)
     private String role;
 
     @NotNull(message = "Phone is required")
