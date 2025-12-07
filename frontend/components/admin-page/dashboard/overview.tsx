@@ -18,7 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// Konfigurasi untuk chart
 const chartConfig = {
   user: {
     label: "Users",

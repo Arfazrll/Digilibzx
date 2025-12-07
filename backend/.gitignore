@@ -38,3 +38,5 @@ build/
 !**/src/test/**/build/
 
 .vscode/
+
+.application.properties
