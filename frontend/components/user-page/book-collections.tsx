@@ -103,7 +103,6 @@ export default function BookCollection({ search = "", category = "", years = "" 
                                 )}
                             </div>
 
-
                             {/* Card Content */}
                             <div className="p-4">
                                 <Link href={`/collections/book/${book.id}`}>
