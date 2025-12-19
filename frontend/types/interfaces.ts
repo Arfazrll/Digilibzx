@@ -75,7 +75,7 @@ export interface User {
   password?: string;
   name: string;
   phone?: string;
-  role: "admin" | "user";
+  role: "admin" | "user" | "lecturer" | "student";
 }
 
 // transaction

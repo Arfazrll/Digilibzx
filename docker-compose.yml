@@ -1,28 +1,4 @@
-version: '3.9'
-
 services:
-  # MySQL Database Service
-  mysql:
-    image: mysql:8.0-alpine
-    container_name: digilibz-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: digilibz
-      MYSQL_USER: digilibz_user
-      MYSQL_PASSWORD: digilibz_pass
-      TZ: Asia/Jakarta
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - digilibz-network
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
-      retries: 10
-      interval: 10s
-
   # Backend Service (Spring Boot)
   backend:
     build:
@@ -30,9 +6,9 @@ services:
       dockerfile: Dockerfile
     container_name: digilibz-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/digilibz?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta
-      SPRING_DATASOURCE_USERNAME: digilibz_user
-      SPRING_DATASOURCE_PASSWORD: digilibz_pass
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/digilibz?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SERVER_PORT: 8080
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -41,10 +17,7 @@ services:
       LOGGING_LEVEL_ORG_HIBERNATE: ERROR
       SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     ports:
-      - "8080:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
+      - "8081:8080"
     networks:
       - digilibz-network
     restart: unless-stopped
@@ -57,7 +30,7 @@ services:
     container_name: digilibz-frontend
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://backend:8080
+      NEXT_PUBLIC_API_URL: http://localhost:8081
     ports:
       - "3000:3000"
     depends_on:
@@ -69,7 +42,3 @@ services:
 networks:
   digilibz-network:
     driver: bridge
-
-volumes:
-  mysql_data:
-    driver: local
