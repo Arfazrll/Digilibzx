@@ -1585,8 +1585,3 @@ logging.level.com.digilibz=INFO
 **Last Updated:** December 26, 2024
 
 ---
-
-
-**Q2:** Apakah perlu saya buatkan Docker Compose file untuk deployment development?
-
-**Q3:** Perlu implementasi JWT authentication untuk menggantikan simple token UUID?
