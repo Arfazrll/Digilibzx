@@ -64,7 +64,7 @@ export default function LoginPage() {
       position: "bottom-right",
       dismissible: true,
       closeButton: true
-    });
+    }); 
   }, []);
 
   const form = useForm<z.infer<typeof loginFormSchema>>({

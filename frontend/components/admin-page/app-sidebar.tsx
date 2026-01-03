@@ -25,7 +25,7 @@ import { toast } from "sonner";
 const data = {
     user: {
         name: "admin",
-        email: "admin@admin.com",
+        email: "admin@gmail.com",
         avatar: `https://api.dicebear.com/6.x/initials/svg?seed=admin`,
     },
     navMain: [

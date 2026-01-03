@@ -338,7 +338,7 @@ function BookForm({ book, onSubmit }: BookFormProps) {
                         />
                     </div>
                     <div>
-                        <Label htmlFor="lateFee">Late Fee</Label>
+                        <Label htmlFor="lateFee">Price</Label>
                         <Input id="lateFee" name="lateFee" type="number" value={formData.lateFee} onChange={handleChange} required />
                     </div>
                     <div>

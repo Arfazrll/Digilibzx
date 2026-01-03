@@ -39,6 +39,8 @@ build/
 
 .vscode/
 
+
 **/application.properties
 **/application.yml
 **/application-dev.properties
+**/application-docker.properties
