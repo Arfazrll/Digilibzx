@@ -18,11 +18,20 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
+# Add non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Set correct permissions
+RUN chown -R spring:spring /app
+
 # Copy built jar from builder stage
 COPY --from=builder /app/target/digilibz-*.jar digilibz.jar
 
 # Expose port
 EXPOSE 8080
+
+# Switch to non-root user
+USER spring:spring
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "digilibz.jar"]

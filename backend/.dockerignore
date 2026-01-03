@@ -2,7 +2,7 @@ target
 .git
 .gitignore
 *.md
-.env
+.env*
 node_modules
 npm-debug.log
 .DS_Store
