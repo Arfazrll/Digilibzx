@@ -1,6 +1,6 @@
 export async function fetchReviewsByBookId(bookId: string) {
     // Bersihkan tanda kutip jika ada
-    const sanitizedUserId = bookId.replace(/^"|"$/g, "");
+    const sanitizedUserId = bookId.replace(/(^")|("$)/g, "");
     const response = await fetch(`${process.env.API_BASE_URL_PRODUCTION}/reviews?bookId=${sanitizedUserId}`, {
         method: 'GET',
     });

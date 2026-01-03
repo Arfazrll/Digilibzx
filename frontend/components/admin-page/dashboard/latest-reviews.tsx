@@ -6,8 +6,8 @@ export function LatestReviews(data: any) {
   console.log(data)
   return (
     <div className="space-y-4">
-        {data?.data?.map((item:any, index:number) => (
-      <Card>
+      {data?.data?.map((item: any, index: number) => (
+        <Card>
           <CardContent className="pt-6">
             <div className="flex items-center">
               <Avatar className="h-9 w-9">
@@ -21,7 +21,7 @@ export function LatestReviews(data: any) {
                 </p>
               </div>
               <div className="flex items-center ml-auto font-medium">
-              {[...Array(5)].map((_, i:number) => (
+                {[...new Array(5)].map((_, i: number) => (
                   <Star
                     key={i}
                     className={`w-5 h-5 ${i < Math.floor(item.rating)
@@ -33,11 +33,11 @@ export function LatestReviews(data: any) {
               </div>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-            {item.content}
+              {item.content}
             </p>
           </CardContent>
-      </Card>
-        ))}
+        </Card>
+      ))}
     </div>
   )
 }

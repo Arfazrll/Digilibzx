@@ -4,10 +4,10 @@ import { books } from '@/app/api/books/data';
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const maxParam = searchParams.get('max');
-    const max = maxParam ? parseInt(maxParam, 10) : 4; // Default max = 4
+    const max = maxParam ? Number.parseInt(maxParam, 10) : 4; // Default max = 4
 
     // Validasi input
-    if (isNaN(max) || max <= 0) {
+    if (Number.isNaN(max) || max <= 0) {
         return NextResponse.json({ error: "Invalid 'max' parameter" }, { status: 400 });
     }
 

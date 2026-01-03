@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from "sonner";
-import {verifyToken, deleteToken} from "@/common/tokenizer";
+import { verifyToken, deleteToken } from "@/common/tokenizer";
 
 import { Book, Menu, Sunset, Trees, Zap, Bell, User, Bookmark, LogOut, Search, History } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -254,7 +254,7 @@ const NotificationComponent = () => {
   const [notifications, setNotifications] = useState<Notification[]>()
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  
+
   // Fetch Notifications
   useEffect(() => {
     async function loadNotifications() {
@@ -285,7 +285,7 @@ const NotificationComponent = () => {
   if (error) {
     return <div className="error"></div>;
   }
-  return(
+  return (
     <NavigationMenuList className="mr-5 gap-4 flex items-center">
       <NavigationMenuItem>
         <DropdownMenu>
@@ -302,7 +302,7 @@ const NotificationComponent = () => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {notifications?.filter(n => !n.read).map(( notification: Notification ) => (
+            {notifications?.filter(n => !n.read).map((notification: Notification) => (
               <DropdownMenuItem key={notification.id} asChild>
                 <Link href="/settings/notifications">
                   <span className="w-full text-center cursor-pointer">{notification.title}</span>
@@ -345,14 +345,14 @@ export default function Navbar() {
     const fetchData = async () => {
       const verify = verifyToken();
       setIsLoggedIn(verify);
-  
+
       if (verify) {
         try {
           const userId = localStorage.getItem("userId");
           if (!userId) {
             throw new Error("User ID tidak ditemukan di localStorage");
           }
-  
+
           const data = await fetchUserById(userId);
           setUserData({ name: data.name, role: data.role });
         } catch (error) {
@@ -361,7 +361,7 @@ export default function Navbar() {
         }
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -393,7 +393,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center w-full max-w-lg gap-4">
             <SearchBar />
-            { isLoggedIn && <Cart /> }
+            {isLoggedIn && <Cart />}
           </div>
           <div className="flex gap-2">
             {isLoggedIn ? (
@@ -412,7 +412,7 @@ export default function Navbar() {
                     Peminjaman
                   </a> */}
 
-                  <NotificationComponent/>
+                  <NotificationComponent />
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -521,7 +521,7 @@ export default function Navbar() {
                               className={cn(
                                 'flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
                               )}
-                              href="#"
+                              href="/"
                             >
                               {item.icon}
                               <div>
@@ -584,7 +584,7 @@ export default function Navbar() {
                               className={cn(
                                 'flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
                               )}
-                              href="#"
+                              href="/"
                             >
                               {item.icon}
                               <div>

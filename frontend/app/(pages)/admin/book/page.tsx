@@ -275,7 +275,7 @@ function BookForm({ book, onSubmit }: BookFormProps) {
         setFormData((prev) => ({
             ...prev,
             [name]: name === "year" || name === "quota" || name === "availableCopies" || name === "lateFee"
-                ? parseInt(value, 10) || 0
+                ? Number.parseInt(value, 10) || 0
                 : value,
         }));
     };

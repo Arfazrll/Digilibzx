@@ -20,7 +20,7 @@
  */
 export async function fetchNotificationsByUserId(userId: string) {
     // Bersihkan tanda kutip jika ada
-    const sanitizedUserId = userId.replace(/^"|"$/g, "");
+    const sanitizedUserId = userId.replace(/(^")|("$)/g, "");
     const response = await fetch(`${process.env.API_BASE_URL_PRODUCTION}/notifications?userId=${sanitizedUserId}`, {
         method: 'GET',
     });

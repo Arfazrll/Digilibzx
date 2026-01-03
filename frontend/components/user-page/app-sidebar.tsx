@@ -215,7 +215,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <a href="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                   <img
                     src={assets.logoUrl}
@@ -247,7 +247,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
             <NavNonBook kind="Journal" items={data.navNonBook} />
           </TabsContent>
         </Tabs> */}
-        <TabsComponent data={data}/>
+        <TabsComponent data={data} />
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4 bg-white">

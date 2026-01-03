@@ -140,21 +140,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-in-out;
-        }
-      `}</style>
     </section>
   );
 };
@@ -382,7 +367,7 @@ function BookSwiperCard() {
                     </h2>
                     <p className="text-sm text-gray-600 mb-2">by {book.author}</p>
                     <div className="flex items-center mb-2">
-                      {[...Array(5)].map((_, i) => (
+                      {[...new Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`w-4 h-4 ${

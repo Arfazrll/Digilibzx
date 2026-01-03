@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from "sonner";
-import {verifyToken, deleteToken} from "@/common/tokenizer";
+import { verifyToken, deleteToken } from "@/common/tokenizer";
 
 import { Book, Menu, Sunset, Trees, Zap, Bell, User, Bookmark, LogOut, Search, History } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -125,7 +125,7 @@ export default function NavbarAdmin({ loggedAs = "Admin", userName = "Admin" }: 
             </Link>
 
             {/* button space here */}
-          
+
           </div>
           <div className="flex items-center w-full max-w-lg gap-4">
             {/* space kosong tengah */}
@@ -314,7 +314,7 @@ export default function NavbarAdmin({ loggedAs = "Admin", userName = "Admin" }: 
                               className={cn(
                                 'flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
                               )}
-                              href="#"
+                              href="/"
                             >
                               {item.icon}
                               <div>

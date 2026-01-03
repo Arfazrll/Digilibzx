@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id CHAR(36) PRIMARY KEY NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255),
@@ -8,7 +8,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE books (
-    id CHAR(36) PRIMARY KEY NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
     title VARCHAR(255) NOT NULL UNIQUE,
     author VARCHAR(255) NOT NULL,
     category VARCHAR(255),
@@ -26,8 +26,8 @@ CREATE TABLE books (
 );
 
 CREATE TABLE transactions (
-    id CHAR(36) PRIMARY KEY NOT NULL,
-    user_id CHAR(36) NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
     invoice_code VARCHAR(255) NOT NULL UNIQUE,
     date_from DATE NOT NULL,
     date_to DATE NOT NULL,
@@ -40,17 +40,17 @@ CREATE TABLE transactions (
 );
 
 CREATE TABLE transaction_items (
-    id CHAR(36) PRIMARY KEY NOT NULL,
-    transaction_id CHAR(36) NOT NULL,
-    book_id CHAR(36) NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
+    transaction_id VARCHAR(36) NOT NULL,
+    book_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
 );
 
 CREATE TABLE reviews (
-    id CHAR(36) PRIMARY KEY NOT NULL,
-    book_id CHAR(36) NOT NULL,
-    author_id CHAR(36) NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
+    book_id VARCHAR(36) NOT NULL,
+    author_id VARCHAR(36) NOT NULL,
     date TIMESTAMP NOT NULL,
     rating DOUBLE NOT NULL,
     content TEXT NOT NULL,
@@ -59,8 +59,8 @@ CREATE TABLE reviews (
 );
 
 CREATE TABLE notifications (
-    id CHAR(36) PRIMARY KEY NOT NULL,
-    user_id CHAR(36) NOT NULL,
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     type ENUM('INFO', 'REMINDER', 'ALERT') NOT NULL,

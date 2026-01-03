@@ -46,7 +46,7 @@ export default function BookDetailPage({ params }: { params: { id_book: string }
     setIsExpanded((prev: boolean) => !prev);
   };
 
- const generateSummary = async () => {
+  const generateSummary = async () => {
     if (!bookData) return;
 
     setGeneratingSummary(true);
@@ -90,7 +90,7 @@ export default function BookDetailPage({ params }: { params: { id_book: string }
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <LoadingComponent/>
+        <LoadingComponent />
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function BookDetailPage({ params }: { params: { id_book: string }
             </div>
             <div className="mt-4 flex items-center justify-center">
               <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
+                {[...new Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`w-5 h-5 ${i < Math.floor(bookData.rating)
@@ -245,9 +245,8 @@ export default function BookDetailPage({ params }: { params: { id_book: string }
             ) : (
               <>
                 <p
-                  className={`text-muted-foreground text-justify ${
-                    !isExpanded ? "line-clamp-3" : ""
-                  }`}
+                  className={`text-muted-foreground text-justify ${!isExpanded ? "line-clamp-3" : ""
+                    }`}
                 >
                   {bookData.description}
                 </p>
